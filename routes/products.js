@@ -2,6 +2,7 @@ var express = require("express")
 var router = express.Router()
 const productModel = require('../models/product'); // Adjust the path based on your project structure
 const multer = require('multer')
+const mongoose = require('mongoose')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {

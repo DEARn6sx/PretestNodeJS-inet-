@@ -1,24 +1,19 @@
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require('dotenv').config()
+require('./db/connect')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const productsRouter = require('./routes/products');
 var app = express();
 var cors = require('cors')
-const mongoose = require('mongoose')
-const { DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS } = process.env
-mongoose.connect(`mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`,{
-  user: DB_USER,
-  pass: DB_PASS
-}).then(() => {
-  console.log('DB connect!!!');
-}).catch(err => {
-  console.log('DB connect fail !!!');
-})
+
+
+
 app.use(cors())
 
 // view engine setup
