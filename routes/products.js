@@ -1,6 +1,7 @@
 var express = require("express")
 var router = express.Router()
 const productModel = require('../models/product'); // Adjust the path based on your project structure
+const mongoose = require('mongoose');
 
 router.post("/", async function(req, res, next) {
     try {
@@ -44,25 +45,26 @@ router.get("/", async function(req, res, next) {
         });
     }
 })
+
 router.get("/:id", async function(req, res, next) {
     try {
         let id = req.params.id;
-
-        let product = await productModel.findById(id);
-
-        if (!product) {
-            return res.status(404).send({
-                message: "Product not found",
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({
+                message: "Invalid product ID",
                 success: false,
+                error: ["Id is not a ObjectId"]
             });
         }
 
-        return res.status(200).send({
-            data: product,
-            message: "Success",
-            success: true,
-        });
-
+        let products = await productModel.findById(id);
+            return res.status(200).send({
+                data: products,
+                message: "Successed",
+                success: true,
+            });
+        
+       
     } catch (error) {
         console.error(error);
         return res.status(500).send({
@@ -76,13 +78,65 @@ router.get("/:id", async function(req, res, next) {
 
 
 
+router.put("/:id", async function(req, res, next) {
+    try {
+        let id = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({
+                message: "Invalid product ID",
+                success: false,
+                error: ["Id is not a ObjectId"]
+            });
+        }
 
-router.put("/", function(req, res, next) {
-    res.send("Method Put")
+        await productModel.updateOne(
+            { _id: new mongoose.Types.ObjectId(id) },
+            { $set: req.body }
+            );
+        let product = await productModel.findById(id);
+        return res.status(201).send({
+            data: product,
+            message: "Successed",
+            success: true,
+        });    
+       
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({
+            message: "Server error",
+            success: false,
+        });
+    }
 })
 
-router.delete("/", function(req, res, next) {
-    res.send("Method Delete")
+router.delete("/:id", async function(req, res, next) {
+    try {
+        let id = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({
+                message: "Invalid product ID",
+                success: false,
+                error: ["Id is not a ObjectId"]
+            });
+        }
+
+        await productModel.deleteOne(
+            { _id: new mongoose.Types.ObjectId(id) }
+            );
+        let products = await productModel.find();
+        return res.status(200).send({
+            data: products,
+            message: "Delete Successed",
+            success: true,
+        });    
+       
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({
+            message: "Delete fail",
+            success: false,
+        });
+    }
 })
 
 module.exports = router;
