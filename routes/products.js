@@ -1,31 +1,42 @@
 var express = require("express")
 var router = express.Router()
 const productModel = require('../models/product'); // Adjust the path based on your project structure
-const mongoose = require('mongoose');
+const multer = require('multer')
 
-router.post("/", async function(req, res, next) {
-    try {
-        const { id, product_name, price, amount } = req.body;
-        let newProduct = new productModel({
-            id: id,
-            product_name: product_name,
-            price: price,
-            amount: amount,
-        });
-        let product = await newProduct.save();
-        return res.status(201).send({
-            data: product,
-            message: "Create Successed",
-            success: true,
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).send({
-            message: "Create Failed!!",
-            success: false,
-        });
-    }
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/images');
+    },
+    filename: function (req, file, cb) {
+        cb(null, new Date().getTime() + "_" + file.originalname);
+    },
 });
+
+const upload = multer({ storage: storage });
+
+// router.post("/", async function(req, res, next) {
+//     try {
+//         const { id, product_name, price, amount } = req.body;
+//         let newProduct = new productModel({
+//             id: id,
+//             product_name: product_name,
+//             price: price,
+//             amount: amount,
+//         });
+//         let product = await newProduct.save();
+//         return res.status(201).send({
+//             data: product,
+//             message: "Create Successed",
+//             success: true,
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).send({
+//             message: "Create Failed!!",
+//             success: false,
+//         });
+//     }
+// });
 
 
 router.get("/", async function(req, res, next) {
@@ -138,5 +149,38 @@ router.delete("/:id", async function(req, res, next) {
         });
     }
 })
+
+
+router.post("/", upload.single('image'), async function(req, res, next) {
+    try {
+
+        let nameImage = "rambo.jpg"
+        if (req.file) {
+            nameImage = req.file.fieldname
+        }
+        const { id, product_name, price, amount } = req.body;
+        let newProduct = new productModel({
+            id: id,
+            product_name: product_name,
+            price: price,
+            amount: amount,
+            img: nameImage
+        });
+        let product = await newProduct.save();
+        return res.status(201).send({
+            data: product,
+            message: "Create Successed",
+            success: true,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({
+            message: "Create Failed!!",
+            success: false,
+        });
+    }
+});
+
+
 
 module.exports = router;
