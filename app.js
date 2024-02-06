@@ -10,6 +10,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var productsRouter = require('./routes/products');
 var registerRouter = require('./routes/register');
+var approveRouter = require('./routes/approve');
+var orderRouter = require('./routes/orders');
 var app = express();
 var cors = require('cors')
 
@@ -32,6 +34,8 @@ app.use('/', indexRouter);
 app.use('/users',verifyToken, usersRouter);
 app.use('/products', productsRouter);
 app.use('/register', registerRouter)
+app.use('/approve', approveRouter)
+app.use('/orders', orderRouter)
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
