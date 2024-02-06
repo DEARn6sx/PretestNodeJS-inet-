@@ -10,34 +10,50 @@ router.get('/', function(req, res, next) {
 
 router.post('/login', async function(req, res, next) {
   try {
-    let { password, username } = req.body
+    let { password, username } = req.body;
+
+    // Check if username and password are provided
+    if (!username || !password) {
+      return res.status(400).send({
+        message: "Username and password are required",
+        success: false,
+      });
+    }
+
     let user = await Users.findOne({
       username: username,
-    })
-    if (!user) {
-      return res.status(500).send({
-        message: "Login fail",
-        success: false,
     });
-    }
-    const checkPassword = await bcrypt.compare(password, user.password); // Fix typo here
-    if (!checkPassword) {
-      return res.status(500).send({
-        message: "Login fail",
+
+    if (!user) {
+      return res.status(401).send({
+        message: "Login failed - User not found",
         success: false,
-    });}
-    const { _id, firstName, lastName, email } = user
-    return res.status(201).send({
-      data: { _id, firstName, lastName, email},
-      message: "Login Successed",
+      });
+    }
+
+    const checkPassword =  bcrypt.compare(password, user.password);
+
+    if (!checkPassword) {
+      return res.status(401).send({
+        message: "Login failed - Incorrect password",
+        success: false,
+      });
+    }
+
+    const { _id, firstName, lastName, email } = user;
+
+    return res.status(200).send({
+      data: { _id, firstName, lastName, email },
+      message: "Login successful",
       success: true,
-    })
-    
+    });
+
   } catch (error) {
+    console.error(error);
     return res.status(500).send({
-      message: "Login fail",
+      message: "Internal Server Error",
       success: false,
-  });
+    });
   }
 });
 

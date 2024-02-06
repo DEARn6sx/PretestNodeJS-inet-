@@ -134,11 +134,11 @@ router.post("/", upload.single('image'), async function(req, res, next) {
       if (req.file) {
           nameImage = req.file.fieldname
       }
-      const { username, paassword, firstName, lastName, email } = req.body;
-      let hashPassword = await bcrypt.hash(paassword, 10)
+      const { username, password, firstName, lastName, email } = req.body;
+      let hashPassword = await bcrypt.hash(password, 10)
       let newUser = new userModel({
         username: username,
-        paassword: hashPassword,
+        password: hashPassword,
         firstName: firstName,
         lastName: lastName,
         email: email,
