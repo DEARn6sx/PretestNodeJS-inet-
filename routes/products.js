@@ -1,6 +1,7 @@
 var express = require("express")
 var router = express.Router()
-const productModel = require('../models/product'); // Adjust the path based on your project structure
+const productModel = require('../models/product'); 
+const orderModel = require('../models/orders'); 
 const multer = require('multer')
 const mongoose = require('mongoose')
 
@@ -158,7 +159,7 @@ router.delete("/:id", async function(req, res, next) {
     }
 })
 
-// PUT endpoint for updating an order by ID
+
 router.post('/orders/:id', async (req, res) => {
     try {
       const id = req.params.id;
@@ -175,7 +176,7 @@ router.post('/orders/:id', async (req, res) => {
       }
   
       // Check if order is not 0
-      if (order+ product.order === 0) {
+      if (order + product.order === 0) {
         return res.status(400).send({
           message: "Invalid order value for PUT request. Use POST for new orders.",
           success: false,
@@ -183,10 +184,10 @@ router.post('/orders/:id', async (req, res) => {
       }
   
       // Check if order <= amount
-      if (order+ product.order > product.amount) {
+      if (order + product.order > product.amount) {
         return res.status(400).send({
           message: "Order quantity cannot exceed product amount.",
-          amount_product: `Order  product amount now is ${product.amount-product.order}`,
+          amount_product: `Order product amount now is ${product.amount - product.order}`,
           success: false,
         });
       }
@@ -196,17 +197,23 @@ router.post('/orders/:id', async (req, res) => {
   
       // Save the updated product
       await product.save();
-
-      
-      
+  
+      // Calculate totalprice
+      const totalprice = product.price * order;
+  
+      // Your logic for creating a new order goes here
+      const newOrder = new orderModel({
+        product_name: product.product_name,
+        amount: order ,
+        totalprice: totalprice,
+      });
+  
+      await newOrder.save();
   
       return res.status(200).send({
         message: "Order updated successfully",
         success: true,
       });
-
-
-    
     } catch (error) {
       console.error(error);
       return res.status(500).send({
@@ -215,5 +222,7 @@ router.post('/orders/:id', async (req, res) => {
       });
     }
   });
+  
+  module.exports = router;
 
 module.exports = router;
