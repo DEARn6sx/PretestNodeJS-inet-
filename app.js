@@ -13,7 +13,7 @@ var app = express();
 var cors = require('cors')
 
 
-
+const verifyToken = require('./middleware/jwt_decode')
 app.use(cors())
 
 // view engine setup
@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/users',verifyToken, usersRouter);
 app.use('/products', productsRouter);
 
 // catch 404 and forward to error handler

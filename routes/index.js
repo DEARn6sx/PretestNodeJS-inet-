@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const Users = require('../models/users')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -41,9 +42,9 @@ router.post('/login', async function(req, res, next) {
     }
 
     const { _id, firstName, lastName, email } = user;
-
-    return res.status(200).send({
-      data: { _id, firstName, lastName, email },
+    const token = jwt.sign({ _id, firstName, lastName, email }, process.env.JWT_KEY)
+    return res.status(201).send({
+      data: { _id, firstName, lastName, email, token },
       message: "Login successful",
       success: true,
     });

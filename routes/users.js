@@ -5,6 +5,8 @@ const multer = require('multer')
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 
+const verifyToken = require('../middleware/jwt_decode')
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
       cb(null, './public/images');
@@ -17,7 +19,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 /* GET users listing. */
-router.get('/', async function(req, res, next) {
+router.get('/', verifyToken, async function(req, res, next) {
   try {
         
     let users = await userModel.find()
