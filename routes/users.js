@@ -3,7 +3,6 @@ var router = express.Router();
 var userModel = require('../models/users')
 const multer = require('multer')
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
 
 const verifyToken = require('../middleware/jwt_decode')
 
@@ -127,40 +126,6 @@ router.delete("/:id", async function(req, res, next) {
       });
   }
 })
-
-
-router.post("/", upload.single('image'), async function(req, res, next) {
-  try {
-
-      let nameImage = "rambo.jpg"
-      if (req.file) {
-          nameImage = req.file.fieldname
-      }
-      const { username, password, firstName, lastName, email } = req.body;
-      let hashPassword = await bcrypt.hash(password, 10)
-      let newUser = new userModel({
-        username: username,
-        password: hashPassword,
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        img: nameImage
-      });
-      let users = await newUser.save();
-      return res.status(201).send({
-          data: users,
-          message: "Create Successed",
-          success: true,
-      });
-  } catch (error) {
-      console.error(error);
-      return res.status(500).send({
-          message: "Create Failed!!",
-          success: false,
-      });
-  }
-});
-
 
 
 module.exports = router;

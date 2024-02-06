@@ -32,11 +32,19 @@ router.post('/login', async function(req, res, next) {
       });
     }
 
-    const checkPassword =  bcrypt.compare(password, user.password);
+    const checkPassword = await bcrypt.compare(password, user.password);
 
     if (!checkPassword) {
       return res.status(401).send({
         message: "Login failed - Incorrect password",
+        success: false,
+      });
+    }
+
+    // Check if the user is approved
+    if (!user.approved) {
+      return res.status(401).send({
+        message: "Login failed - User not approved",
         success: false,
       });
     }

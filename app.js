@@ -8,12 +8,14 @@ require('dotenv').config()
 require('./db/connect')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-const productsRouter = require('./routes/products');
+var productsRouter = require('./routes/products');
+var registerRouter = require('./routes/register');
 var app = express();
 var cors = require('cors')
 
 
-const verifyToken = require('./middleware/jwt_decode')
+const verifyToken = require('./middleware/jwt_decode');
+const { register } = require('module');
 app.use(cors())
 
 // view engine setup
@@ -29,7 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users',verifyToken, usersRouter);
 app.use('/products', productsRouter);
-
+app.use('/register', registerRouter)
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
