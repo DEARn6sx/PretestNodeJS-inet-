@@ -5,6 +5,7 @@ const productSchema = new mongoose.Schema({
     price: { type: Number },
     amount: { type: Number },
     img: { type: String },
+    order: {type: Number , default: 0},
 }, {
     timestamps: true
 })
