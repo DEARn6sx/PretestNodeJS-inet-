@@ -3,6 +3,7 @@ var router = express.Router();
 var userModel = require('../models/users')
 const multer = require('multer')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -133,11 +134,15 @@ router.post("/", upload.single('image'), async function(req, res, next) {
       if (req.file) {
           nameImage = req.file.fieldname
       }
-      const { name, age } = req.body;
+      const { username, paassword, firstName, lastName, email } = req.body;
+      let hashPassword = await bcrypt.hash(paassword, 10)
       let newUser = new userModel({
-          name: name,
-          age: age,
-          img: nameImage
+        username: username,
+        paassword: hashPassword,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        img: nameImage
       });
       let users = await newUser.save();
       return res.status(201).send({
