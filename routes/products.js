@@ -21,7 +21,7 @@ router.post("/", upload.single('img') ,  async function(req, res, next) {
 
         let nameImage = "rambo.jpg"
         if (req.file) {
-            nameImage = req.file.fieldname
+            nameImage = req.file.filename;
         }
         const { id, product_name, price, amount, order } = req.body;
         let newProduct = new productModel({

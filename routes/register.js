@@ -21,8 +21,9 @@ router.post("/", upload.single('image'), async function(req, res, next) {
   
         let nameImage = "rambo.jpg"
         if (req.file) {
-            nameImage = req.file.fieldname
+            nameImage = req.file.filename;
         }
+        console.log(req.file);
         const { username, password, firstName, lastName, email } = req.body;
         let hashPassword = await bcrypt.hash(password, 10)
         let newUser = new userModel({
