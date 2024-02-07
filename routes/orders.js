@@ -65,7 +65,7 @@ router.delete('/:id', async (req, res) => {
         }
 
         // Update product order quantity (subtracting order.amount)
-        await updateProductOrder(order.product_name, order.amount);
+        await deleteProductOrder(order.product_name, order.amount);
 
         // Delete the order
         await orderModel.findByIdAndDelete(id);
@@ -78,7 +78,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Function to update product order quantity
-async function updateProductOrder(productName, amount) {
+async function deleteProductOrder(productName, amount) {
     try {
         const product = await productModel.findOne({ product_name: productName });
 
@@ -114,6 +114,7 @@ router.put('/:id', async (req, res) => {
         }
 
         const oldAmount = order.amount;
+        const product = await productModel.findOne({ product_name: order.product_name });
 
         // Update product order quantity (subtracting oldAmount and adding newAmount)
         await updateProductOrder(order.product_name, -oldAmount);
@@ -121,6 +122,7 @@ router.put('/:id', async (req, res) => {
 
         // Update the order amount
         order.amount = newAmount;
+        order.totalprice = newAmount * product.price;
 
         // Save the updated order
         await order.save();
@@ -145,7 +147,7 @@ async function updateProductOrder(productName, amount) {
         // Update product.order by subtracting/adding the given amount
         product.order += amount;
 
-        // Save the updated product
+         // Save the updated product
         await product.save();
     } catch (error) {
         console.error(error);
