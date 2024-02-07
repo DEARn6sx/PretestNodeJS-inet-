@@ -21,8 +21,15 @@ const { register } = require('module');
 app.use(cors())
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'pug');
+
+const indexPage = path.join(__dirname, 'templates/index.html')
+app.get("/homepage", (req,res) => {
+  res.status(200)
+  res.type('text/html')
+  res.sendFile(indexPage)
+})
 
 app.use(logger('dev'));
 app.use(express.json());

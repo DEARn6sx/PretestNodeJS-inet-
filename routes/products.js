@@ -159,6 +159,35 @@ router.delete("/:id", async function(req, res, next) {
     }
 })
 
+router.get("/orders/:id", async function(req, res, next) {
+    try {
+        let id = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({
+                message: "Invalid product ID",
+                success: false,
+                error: ["Id is not a ObjectId"]
+            });
+        }
+
+        let products = await productModel.findById(id);
+            return res.status(200).send({
+                data: {products_name: products.product_name, order: products.order, tatalprice: products.price * products.order},
+                message: "Successed",
+                success: true,
+            });
+        
+       
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({
+            message: "Server error",
+            success: false,
+        });
+    }
+});
+
+
 
 router.post('/orders/:id', async (req, res) => {
     try {
@@ -175,13 +204,6 @@ router.post('/orders/:id', async (req, res) => {
         });
       }
   
-      // Check if order is not 0
-      if (order + product.order === 0) {
-        return res.status(400).send({
-          message: "Invalid order value for PUT request. Use POST for new orders.",
-          success: false,
-        });
-      }
   
       // Check if order <= amount
       if (order + product.order > product.amount) {
