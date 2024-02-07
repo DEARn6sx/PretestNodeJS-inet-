@@ -183,7 +183,7 @@ router.get("/orders/:id", async function(req, res, next) {
         }
 
         // Find orders with the same product_name
-        let orders = await orderModel.find({ product_name: product.product_name });
+        let orders = await orderModel.find({ product_id: product.id });
 
         return res.status(200).send({
             data: orders,
@@ -237,6 +237,7 @@ router.post('/orders/:id', async (req, res) => {
   
       // Your logic for creating a new order goes here
       const newOrder = new orderModel({
+        product_id: product.id,
         product_name: product.product_name,
         amount: order ,
         totalprice: totalprice,

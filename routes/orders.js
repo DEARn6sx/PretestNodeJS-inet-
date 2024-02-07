@@ -116,15 +116,20 @@ router.put('/:id', async (req, res) => {
         const oldAmount = order.amount;
         const product = await productModel.findOne({ product_name: order.product_name });
 
-        // Update product order quantity (subtracting oldAmount and adding newAmount)
-        await updateProductOrder(order.product_name, -oldAmount);
-        await updateProductOrder(order.product_name, newAmount);
+        // Update product order quantity
+        product.order = product.order - oldAmount + newAmount;
 
-        // Update the order amount
+        // Check if the new product order quantity exceeds the available amount
+        if (product.order < 0 || product.order > product.amount) {
+            return res.status(400).json({ message: 'New order quantity exceeds available amount' });
+        }
+
+        // Update the order amount and total price
         order.amount = newAmount;
         order.totalprice = newAmount * product.price;
 
-        // Save the updated order
+        // Save the updated product and order
+        await product.save();
         await order.save();
 
         res.json({ message: 'Order updated successfully' });
@@ -133,26 +138,5 @@ router.put('/:id', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
-// Function to update product order quantity
-async function updateProductOrder(productName, amount) {
-    try {
-        const product = await productModel.findOne({ product_name: productName });
-
-        if (!product) {
-            console.error('Product not found');
-            return;
-        }
-
-        // Update product.order by subtracting/adding the given amount
-        product.order += amount;
-
-         // Save the updated product
-        await product.save();
-    } catch (error) {
-        console.error(error);
-    }
-}
-
 
 module.exports = router;
