@@ -162,6 +162,8 @@ router.delete("/:id", async function(req, res, next) {
 router.get("/orders/:id", async function(req, res, next) {
     try {
         let id = req.params.id;
+
+        // Check if the id is a valid ObjectId
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).send({
                 message: "Invalid product ID",
@@ -170,14 +172,25 @@ router.get("/orders/:id", async function(req, res, next) {
             });
         }
 
-        let products = await productModel.findById(id);
-            return res.status(200).send({
-                data: {products_name: products.product_name, order: products.order, tatalprice: products.price * products.order},
-                message: "Successed",
-                success: true,
+        // Find the product by id
+        let product = await productModel.findById(id);
+
+        if (!product) {
+            return res.status(404).send({
+                message: "Product not found",
+                success: false,
             });
-        
-       
+        }
+
+        // Find orders with the same product_name
+        let orders = await orderModel.find({ product_name: product.product_name });
+
+        return res.status(200).send({
+            data: orders,
+            message: "Successfully retrieved orders",
+            success: true,
+        });
+
     } catch (error) {
         console.error(error);
         return res.status(500).send({
@@ -186,7 +199,6 @@ router.get("/orders/:id", async function(req, res, next) {
         });
     }
 });
-
 
 
 router.post('/orders/:id', async (req, res) => {
@@ -209,7 +221,7 @@ router.post('/orders/:id', async (req, res) => {
       if (order + product.order > product.amount) {
         return res.status(400).send({
           message: "Order quantity cannot exceed product amount.",
-          amount_product: `Order product amount now is ${product.amount - product.order}`,
+          amount_product: `Product amount now is ${product.amount - product.order}`,
           success: false,
         });
       }
